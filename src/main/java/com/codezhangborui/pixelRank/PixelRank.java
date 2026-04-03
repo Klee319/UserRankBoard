@@ -1,6 +1,7 @@
 package com.codezhangborui.pixelRank;
 
 import com.codezhangborui.pixelRank.database.Database;
+import com.codezhangborui.pixelRank.handler.EconomyHandler;
 import com.codezhangborui.pixelRank.handler.EventListener;
 import com.codezhangborui.pixelRank.handler.LeaderboardHandler;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,6 +17,9 @@ public final class PixelRank extends JavaPlugin {
         Configuration.setDefault("ranks.placing_rank", true, "Whether to display the placement rank");
         Configuration.setDefault("ranks.online_time_rank", true, "Whether to display the online time rank");
         Configuration.setDefault("ranks.death_rank", false, "Whether to display the death rank");
+        Configuration.setDefault("ranks.movement_rank", true, "Whether to display the movement distance rank");
+        Configuration.setDefault("ranks.mob_kill_rank", true, "Whether to display the mob kill rank");
+        Configuration.setDefault("ranks.money_rank", true, "Whether to display the money rank (requires Vault)");
         Configuration.setDefault("ranks.switch_interval", 15, "The interval of switching ranks on the scoreboard");
         Configuration.setDefault("ranks.ignore_username_regex", "Input_a_regex_here_to_ignore_specific_usernames", "The regex to ignore specific usernames");
         Configuration.setDefault("storage.database", "database.db", "The filename of local SQLite database file");
@@ -24,6 +28,9 @@ public final class PixelRank extends JavaPlugin {
         Configuration.setDefault("leaderboards.placing_rank", "Placement", "The title of the placement rank leaderboard");
         Configuration.setDefault("leaderboards.online_time_rank", "Online Time", "The title of the online time rank leaderboard");
         Configuration.setDefault("leaderboards.death_rank", "Death", "The title of the death rank leaderboard");
+        Configuration.setDefault("leaderboards.movement_rank", "Movement", "The title of the movement distance rank leaderboard");
+        Configuration.setDefault("leaderboards.mob_kill_rank", "Mob Kills", "The title of the mob kill rank leaderboard");
+        Configuration.setDefault("leaderboards.money_rank", "Money", "The title of the money rank leaderboard");
         Configuration.setDefault("leaderboards.max_leaderboard_size", 10, "The maximum size of the leaderboard");
     }
 
@@ -39,6 +46,11 @@ public final class PixelRank extends JavaPlugin {
             logger.severe("Failed to load data from the database. Plugin will be disabled.");
             getServer().getPluginManager().disablePlugin(this);
             return;
+        }
+        if (EconomyHandler.setup(this)) {
+            logger.info("\033[32mVault economy detected! Money rank enabled.\033[0m");
+        } else {
+            logger.info("\033[33mVault economy not found. Money rank disabled.\033[0m");
         }
         LeaderboardHandler.updateScoreboard();
         logger.info("\033[32mRegistrying events and commands...\033[0m");

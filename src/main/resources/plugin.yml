@@ -4,6 +4,8 @@ author: CodeZhangBorui
 description: "A plugin that ranks players in multiple values."
 main: com.codezhangborui.pixelRank.PixelRank
 api-version: '1.20'
+softdepend:
+  - Vault
 commands:
   pixelrank:
     description: "PixelRank commands"

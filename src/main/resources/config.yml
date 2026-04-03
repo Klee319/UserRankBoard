@@ -1,4 +1,7 @@
 ranks:
+  # Whether the scoreboard is shown by default for new players
+  # true = scoreboard is shown, false = scoreboard is hidden
+  scoreboard_default: true
   # Whether to display the mining rank
   mining_rank: true
   # Whether to display the placement rank
@@ -7,6 +10,12 @@ ranks:
   online_time_rank: true
   # Whether to display the death rank
   death_rank: false
+  # Whether to display the movement distance rank
+  movement_rank: true
+  # Whether to display the mob kill rank
+  mob_kill_rank: true
+  # Whether to display the money rank (requires Vault)
+  money_rank: true
   # The interval of switching ranks on the scoreboard
   switch_interval: 15
   # The regex to ignore specific usernames
@@ -27,5 +36,11 @@ leaderboards:
   online_time_rank: "Online Time"
   # The title of the death rank leaderboard
   death_rank: "Death"
+  # The title of the movement distance rank leaderboard
+  movement_rank: "Movement"
+  # The title of the mob kill rank leaderboard
+  mob_kill_rank: "Mob Kills"
+  # The title of the money rank leaderboard
+  money_rank: "Money"
   # The maximum size of the leaderboard
   max_leaderboard_size: 10

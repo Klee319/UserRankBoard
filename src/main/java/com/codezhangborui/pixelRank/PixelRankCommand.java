@@ -1,6 +1,8 @@
 package com.codezhangborui.pixelRank;
 
 import com.codezhangborui.pixelRank.database.Database;
+import com.codezhangborui.pixelRank.handler.EconomyHandler;
+import com.codezhangborui.pixelRank.handler.LeaderboardHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.TextComponent;
@@ -55,21 +57,25 @@ public class PixelRankCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(Component.text("The server is running PixelRank version " + plugin.getDescription().getVersion(), NamedTextColor.AQUA));
-            sender.sendMessage(Component.text("Use ", NamedTextColor.WHITE)
+            sender.sendMessage(Component.text("サーバーは PixelRank バージョン " + plugin.getDescription().getVersion() + " を実行しています", NamedTextColor.AQUA));
+            sender.sendMessage(Component.text("詳細は ", NamedTextColor.WHITE)
                     .append(Component.text("/pixelrank help", NamedTextColor.AQUA).clickEvent(ClickEvent.runCommand("/pixelrank help")))
-                    .append(Component.text(" for more information.", NamedTextColor.WHITE)));
+                    .append(Component.text(" をご覧ください。", NamedTextColor.WHITE)));
             return true;
         } else if (args.length == 1 && args[0].equalsIgnoreCase("help")) {
             ComponentBuilder<TextComponent, TextComponent.Builder> message = Component.text();
-            message.append(Component.text("PixelRank Help:", NamedTextColor.AQUA)).append(Component.newline());
+            message.append(Component.text("PixelRank ヘルプ:", NamedTextColor.AQUA)).append(Component.newline());
             message.append(Component.text("/pixelrank help", NamedTextColor.WHITE).clickEvent(ClickEvent.runCommand("/pixelrank help"))
-                    .append(Component.text(" - Show this help message.", NamedTextColor.GRAY))).append(Component.newline());
-            message.append(Component.text("/pixelrank rank <mine|place|time|death>", NamedTextColor.WHITE).clickEvent(ClickEvent.runCommand("/pixelrank rank"))
-                    .append(Component.text(" - Show the specific rank.", NamedTextColor.GRAY))).append(Component.newline());
+                    .append(Component.text(" - このヘルプを表示します。", NamedTextColor.GRAY))).append(Component.newline());
+            message.append(Component.text("/pixelrank rank <mine|place|time|death|move|mobkill|money>", NamedTextColor.WHITE).clickEvent(ClickEvent.runCommand("/pixelrank rank"))
+                    .append(Component.text(" - 指定したランキングを表示します。", NamedTextColor.GRAY))).append(Component.newline());
+            if (sender instanceof Player) {
+                message.append(Component.text("/pixelrank toggle", NamedTextColor.WHITE).clickEvent(ClickEvent.runCommand("/pixelrank toggle"))
+                        .append(Component.text(" - スコアボードの表示を切り替えます。", NamedTextColor.GRAY))).append(Component.newline());
+            }
             if (sender.isOp() || sender.hasPermission("pixelrank.admin") || sender instanceof ConsoleCommandSender) {
                 message.append(Component.text("/pixelrank reload", NamedTextColor.WHITE).clickEvent(ClickEvent.runCommand("/pixelrank reload"))
-                        .append(Component.text(" - Reload the configuration file.", NamedTextColor.GRAY)).append(Component.newline()));
+                        .append(Component.text(" - 設定ファイルを再読み込みします。", NamedTextColor.GRAY)).append(Component.newline()));
             }
             sender.sendMessage(message.build());
             return true;
@@ -79,75 +85,119 @@ public class PixelRankCommand implements CommandExecutor, TabCompleter {
                 if (!Database.save()) {
                     plugin.getLogger().severe("Failed to save data to the database!");
                 }
-                sender.sendMessage(Component.text("Configuration has been successfully reloaded.", NamedTextColor.GREEN));
+                sender.sendMessage(Component.text("設定を再読み込みしました。", NamedTextColor.GREEN));
             } else {
-                sender.sendMessage(Component.text("You do not have permission to execute this command.", NamedTextColor.RED));
+                sender.sendMessage(Component.text("このコマンドを実行する権限がありません。", NamedTextColor.RED));
+            }
+            return true;
+        } else if (args.length == 1 && args[0].equalsIgnoreCase("toggle")) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(Component.text("このコマンドはプレイヤーのみ実行できます。", NamedTextColor.RED));
+                return true;
+            }
+            Player player = (Player) sender;
+            boolean enabled = LeaderboardHandler.toggleScoreboard(player);
+            if (enabled) {
+                sender.sendMessage(Component.text("スコアボードの表示を有効にしました。", NamedTextColor.GREEN));
+            } else {
+                sender.sendMessage(Component.text("スコアボードの表示を無効にしました。", NamedTextColor.YELLOW));
             }
             return true;
         } else if (args[0].equalsIgnoreCase("rank")) {
             if (args.length == 1) {
-                sender.sendMessage(Component.text("Please specify the rank type:", NamedTextColor.AQUA));
+                sender.sendMessage(Component.text("ランキングの種類を指定してください:", NamedTextColor.AQUA));
                 if (sender instanceof ConsoleCommandSender) {
                     if(Configuration.getBoolean("ranks.mining_rank")) {
-                        sender.sendMessage("\033[96m/pixelrank rank mine\033[0m - Show the mining rank.");
+                        sender.sendMessage("\033[96m/pixelrank rank mine\033[0m - 採掘ランキングを表示します。");
                     }
                     if(Configuration.getBoolean("ranks.placing_rank")) {
-                        sender.sendMessage("\033[96m/pixelrank rank place\033[0m - Show the placing rank.");
+                        sender.sendMessage("\033[96m/pixelrank rank place\033[0m - 設置ランキングを表示します。");
                     }
                     if(Configuration.getBoolean("ranks.online_time_rank")) {
-                        sender.sendMessage("\033[96m/pixelrank rank time\033[0m - Show the online time rank.");
+                        sender.sendMessage("\033[96m/pixelrank rank time\033[0m - プレイ時間ランキングを表示します。");
                     }
                     if(Configuration.getBoolean("ranks.death_rank")) {
-                        sender.sendMessage("\033[96m/pixelrank rank death\033[0m - Show the death rank.");
+                        sender.sendMessage("\033[96m/pixelrank rank death\033[0m - 死亡ランキングを表示します。");
+                    }
+                    if(Configuration.getBoolean("ranks.movement_rank")) {
+                        sender.sendMessage("\033[96m/pixelrank rank move\033[0m - 移動距離ランキングを表示します。");
+                    }
+                    if(Configuration.getBoolean("ranks.mob_kill_rank")) {
+                        sender.sendMessage("\033[96m/pixelrank rank mobkill\033[0m - モブ討伐ランキングを表示します。");
+                    }
+                    if(Configuration.getBoolean("ranks.money_rank") && EconomyHandler.isAvailable()) {
+                        sender.sendMessage("\033[96m/pixelrank rank money\033[0m - 所持金ランキングを表示します。");
                     }
                 } else {
                     ComponentBuilder<TextComponent, TextComponent.Builder> message = Component.text();
                     if(Configuration.getBoolean("ranks.mining_rank")) {
-                        message.append(Component.text("[Mining] ", NamedTextColor.GOLD).clickEvent(ClickEvent.runCommand("/pixelrank rank mine")));
+                        message.append(Component.text("[採掘] ", NamedTextColor.GOLD).clickEvent(ClickEvent.runCommand("/pixelrank rank mine")));
                     }
                     if(Configuration.getBoolean("ranks.placing_rank")) {
-                        message.append(Component.text("[Placing] ", NamedTextColor.AQUA).clickEvent(ClickEvent.runCommand("/pixelrank rank place")));
+                        message.append(Component.text("[設置] ", NamedTextColor.AQUA).clickEvent(ClickEvent.runCommand("/pixelrank rank place")));
                     }
                     if(Configuration.getBoolean("ranks.online_time_rank")) {
-                        message.append(Component.text("[Online Time] ", NamedTextColor.GREEN).clickEvent(ClickEvent.runCommand("/pixelrank rank time")));
+                        message.append(Component.text("[プレイ時間] ", NamedTextColor.GREEN).clickEvent(ClickEvent.runCommand("/pixelrank rank time")));
                     }
                     if(Configuration.getBoolean("ranks.death_rank")) {
-                        message.append(Component.text("[Death] ", NamedTextColor.RED).clickEvent(ClickEvent.runCommand("/pixelrank rank death")));
+                        message.append(Component.text("[死亡] ", NamedTextColor.RED).clickEvent(ClickEvent.runCommand("/pixelrank rank death")));
+                    }
+                    if(Configuration.getBoolean("ranks.movement_rank")) {
+                        message.append(Component.text("[移動距離] ", NamedTextColor.LIGHT_PURPLE).clickEvent(ClickEvent.runCommand("/pixelrank rank move")));
+                    }
+                    if(Configuration.getBoolean("ranks.mob_kill_rank")) {
+                        message.append(Component.text("[モブ討伐] ", NamedTextColor.DARK_RED).clickEvent(ClickEvent.runCommand("/pixelrank rank mobkill")));
+                    }
+                    if(Configuration.getBoolean("ranks.money_rank") && EconomyHandler.isAvailable()) {
+                        message.append(Component.text("[所持金] ", NamedTextColor.YELLOW).clickEvent(ClickEvent.runCommand("/pixelrank rank money")));
                     }
                     sender.sendMessage(message.build());
                 }
                 return true;
             } else {
                 if (args[1].equalsIgnoreCase("mine") && Configuration.getBoolean("ranks.mining_rank")) {
-                    sender.sendMessage(Component.text("Mining Rank:").color(NamedTextColor.AQUA));
+                    sender.sendMessage(Component.text("採掘ランキング:").color(NamedTextColor.AQUA));
                     sendRank(sender, Database.mining_rank);
                     return true;
                 } else if (args[1].equalsIgnoreCase("place") && Configuration.getBoolean("ranks.placing_rank")) {
-                    sender.sendMessage(Component.text("Placing Rank:").color(NamedTextColor.AQUA));
+                    sender.sendMessage(Component.text("設置ランキング:").color(NamedTextColor.AQUA));
                     sendRank(sender, Database.placing_rank);
                     return true;
                 } else if (args[1].equalsIgnoreCase("time") && Configuration.getBoolean("ranks.online_time_rank")) {
-                    sender.sendMessage(Component.text("Online Time Rank:").color(NamedTextColor.AQUA));
+                    sender.sendMessage(Component.text("プレイ時間ランキング:").color(NamedTextColor.AQUA));
                     sendRank(sender, Database.online_time_rank);
                     return true;
                 } else if (args[1].equalsIgnoreCase("death") && Configuration.getBoolean("ranks.death_rank")) {
-                    sender.sendMessage(Component.text("Death Rank:").color(NamedTextColor.AQUA));
+                    sender.sendMessage(Component.text("死亡ランキング:").color(NamedTextColor.AQUA));
                     sendRank(sender, Database.death_rank);
                     return true;
+                } else if (args[1].equalsIgnoreCase("move") && Configuration.getBoolean("ranks.movement_rank")) {
+                    sender.sendMessage(Component.text("移動距離ランキング:").color(NamedTextColor.AQUA));
+                    sendRank(sender, Database.movement_rank);
+                    return true;
+                } else if (args[1].equalsIgnoreCase("mobkill") && Configuration.getBoolean("ranks.mob_kill_rank")) {
+                    sender.sendMessage(Component.text("モブ討伐ランキング:").color(NamedTextColor.AQUA));
+                    sendRank(sender, Database.mob_kill_rank);
+                    return true;
+                } else if (args[1].equalsIgnoreCase("money") && Configuration.getBoolean("ranks.money_rank") && EconomyHandler.isAvailable()) {
+                    sender.sendMessage(Component.text("所持金ランキング:").color(NamedTextColor.AQUA));
+                    EconomyHandler.refreshBalances();
+                    sendRank(sender, EconomyHandler.getCachedBalances());
+                    return true;
                 } else {
-                    TextComponent message = Component.text("Unknown or disabled rank type.", NamedTextColor.RED)
-                            .append(Component.text(" Use ", NamedTextColor.WHITE))
+                    TextComponent message = Component.text("不明または無効なランキングの種類です。", NamedTextColor.RED)
+                            .append(Component.text(" 詳細は ", NamedTextColor.WHITE))
                             .append(Component.text("/pixelrank help", NamedTextColor.AQUA).clickEvent(ClickEvent.runCommand("/pixelrank help")))
-                            .append(Component.text(" for more information.", NamedTextColor.WHITE));
+                            .append(Component.text(" をご覧ください。", NamedTextColor.WHITE));
                     sender.sendMessage(message);
                     return false;
                 }
             }
         } else {
-            TextComponent message = Component.text("Unknown command.", NamedTextColor.RED)
-                            .append(Component.text(" Use ", NamedTextColor.WHITE))
+            TextComponent message = Component.text("不明なコマンドです。", NamedTextColor.RED)
+                            .append(Component.text(" 詳細は ", NamedTextColor.WHITE))
                             .append(Component.text("/pixelrank help", NamedTextColor.AQUA).clickEvent(ClickEvent.runCommand("/pixelrank help")))
-                            .append(Component.text(" for more information.", NamedTextColor.WHITE));
+                            .append(Component.text(" をご覧ください。", NamedTextColor.WHITE));
             sender.sendMessage(message);
             return false;
         }
@@ -159,6 +209,9 @@ public class PixelRankCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             suggestions.add("help");
             suggestions.add("rank");
+            if (sender instanceof Player) {
+                suggestions.add("toggle");
+            }
             if (sender.isOp() || sender.hasPermission("pixelrank.admin") || sender instanceof ConsoleCommandSender) {
                 suggestions.add("reload");
             }
@@ -174,6 +227,15 @@ public class PixelRankCommand implements CommandExecutor, TabCompleter {
             }
             if(Configuration.getBoolean("ranks.death_rank")) {
                 suggestions.add("death");
+            }
+            if(Configuration.getBoolean("ranks.movement_rank")) {
+                suggestions.add("move");
+            }
+            if(Configuration.getBoolean("ranks.mob_kill_rank")) {
+                suggestions.add("mobkill");
+            }
+            if(Configuration.getBoolean("ranks.money_rank") && EconomyHandler.isAvailable()) {
+                suggestions.add("money");
             }
         }
         return suggestions;
