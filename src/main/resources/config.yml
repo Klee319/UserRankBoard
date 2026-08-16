@@ -118,65 +118,70 @@ storage:
   save_interval: 60
 
 leaderboards:
+  # ここに書いた文字列が【スコアボード右側の見出し】としてそのまま出る。
+  # 日本語で書いてよい（サイドバーの見出しは Component なので文字数制限に引っかからない）。
+  # ただし見出しが長いとサイドバー全体の横幅が広がって視界を塞ぐので、
+  # 全角 8 文字程度までに収めること。
   # 採掘ランキングのタイトル
-  mining_rank: "Mining"
+  mining_rank: "採掘数"
   # 設置ランキングのタイトル
-  placing_rank: "Placement"
+  placing_rank: "設置数"
   # プレイ時間ランキングのタイトル
-  online_time_rank: "Online Time"
+  online_time_rank: "プレイ時間"
   # 死亡ランキングのタイトル
-  death_rank: "Death"
+  death_rank: "死亡回数"
   # 移動距離ランキングのタイトル
-  movement_rank: "Movement"
+  movement_rank: "移動距離"
   # モブ討伐ランキングのタイトル
-  mob_kill_rank: "Mob Kills"
+  mob_kill_rank: "モブ討伐数"
   # ジャンプ回数ランキングのタイトル
-  jump_rank: "Jumps"
+  jump_rank: "ジャンプ回数"
   # 所持金ランキングのタイトル
-  money_rank: "Money"
+  money_rank: "所持金"
   # 順位表に表示する最大件数
   max_leaderboard_size: 10
 
   # --- ここから TrinityForge 連携項目のタイトル ---
   # TrinityForge が入っていない場合は順位表自体が登録されないので、この設定は使われない。
   # 採掘レベルランキングのタイトル
-  tf_skill_mining_rank: "Mining Lv"
+  tf_skill_mining_rank: "採掘レベル"
   # 伐採レベルランキングのタイトル
-  tf_skill_woodcutting_rank: "Woodcutting Lv"
+  tf_skill_woodcutting_rank: "伐採レベル"
   # 掘削レベルランキングのタイトル
-  tf_skill_digging_rank: "Digging Lv"
+  tf_skill_digging_rank: "掘削レベル"
   # 農業レベルランキングのタイトル
-  tf_skill_farming_rank: "Farming Lv"
+  tf_skill_farming_rank: "農業レベル"
   # 釣りレベルランキングのタイトル
-  tf_skill_fishing_rank: "Fishing Lv"
+  tf_skill_fishing_rank: "釣りレベル"
   # 鍛冶レベルランキングのタイトル
-  tf_skill_smithing_rank: "Smithing Lv"
+  tf_skill_smithing_rank: "鍛冶レベル"
   # 錬金レベルランキングのタイトル
-  tf_skill_alchemy_rank: "Alchemy Lv"
+  tf_skill_alchemy_rank: "錬金レベル"
   # エンチャントレベルランキングのタイトル
-  tf_skill_enchanting_rank: "Enchanting Lv"
+  tf_skill_enchanting_rank: "付与レベル"
   # 弓術レベルランキングのタイトル
-  tf_skill_archery_rank: "Archery Lv"
+  tf_skill_archery_rank: "弓術レベル"
   # 重武器レベルランキングのタイトル
-  tf_skill_heavy_weapons_rank: "Heavy Weapon Lv"
+  tf_skill_heavy_weapons_rank: "重武器レベル"
   # 軽武器レベルランキングのタイトル
-  tf_skill_light_weapons_rank: "Light Weapon Lv"
+  tf_skill_light_weapons_rank: "軽武器レベル"
   # 重装レベルランキングのタイトル
-  tf_skill_heavy_armor_rank: "Heavy Armor Lv"
+  tf_skill_heavy_armor_rank: "重装レベル"
   # 軽装レベルランキングのタイトル
-  tf_skill_light_armor_rank: "Light Armor Lv"
+  tf_skill_light_armor_rank: "軽装レベル"
   # 魔法レベルランキングのタイトル
-  tf_skill_ars_magic_rank: "Magic Lv"
+  tf_skill_ars_magic_rank: "魔法レベル"
   # 魔法鍛冶レベルランキングのタイトル
-  tf_skill_ars_smithing_rank: "Magic Smithing Lv"
+  tf_skill_ars_smithing_rank: "魔法鍛冶レベル"
   # 総合レベル(POWER)ランキングのタイトル（他スキルから派生する総合レベル）
-  tf_skill_power_rank: "Overall Lv (Power)"
+  # 下の「スキル合計レベル」とは別物なので、見出しでも区別が付くようにしておくこと。
+  tf_skill_power_rank: "総合レベル"
   # スキル合計レベルランキングのタイトル（POWER を除いた各スキルレベルの合計）
-  tf_skill_total_rank: "Skill Lv Sum"
+  tf_skill_total_rank: "スキル合計"
   # 図鑑(アイテム)ランキングのタイトル
-  tf_collection_items_rank: "Item Collection"
+  tf_collection_items_rank: "図鑑(アイテム)"
   # 図鑑(モブ)ランキングのタイトル
-  tf_collection_mobs_rank: "Mob Collection"
+  tf_collection_mobs_rank: "図鑑(モブ)"
   # グリフ解放数ランキングのタイトル
-  tf_glyphs_rank: "Glyphs Unlocked"
+  tf_glyphs_rank: "グリフ解放数"
   # --- TrinityForge 連携項目のタイトルここまで ---
