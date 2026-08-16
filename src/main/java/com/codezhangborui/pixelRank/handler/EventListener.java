@@ -1,6 +1,8 @@
 package com.codezhangborui.pixelRank.handler;
 
 import com.codezhangborui.pixelRank.database.Database;
+import com.codezhangborui.pixelRank.database.RankStat;
+import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -24,47 +26,56 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        String playerName = event.getPlayer().getName();
-        initializePlayerData(playerName);
-        // Apply default scoreboard visibility setting
-        LeaderboardHandler.applyDefaultVisibility(event.getPlayer());
+        Database.initializePlayer(event.getPlayer().getName());
+        // スコアボードの表示設定を適用（読み込みは非同期）
+        LeaderboardHandler.applyDefaultVisibility(plugin, event.getPlayer());
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         String playerName = event.getPlayer().getName();
-        initializePlayerData(playerName);
-        Database.mining_rank.put(playerName, Database.mining_rank.getOrDefault(playerName, 0L) + 1);
+        Database.initializePlayer(playerName);
+        Database.increment(RankStat.MINING, playerName, 1);
     }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         String playerName = event.getPlayer().getName();
-        initializePlayerData(playerName);
-        Database.placing_rank.put(playerName, Database.placing_rank.getOrDefault(playerName, 0L) + 1);
+        Database.initializePlayer(playerName);
+        Database.increment(RankStat.PLACING, playerName, 1);
     }
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         String playerName = event.getEntity().getName();
-        initializePlayerData(playerName);
-        Database.death_rank.put(playerName, Database.death_rank.getOrDefault(playerName, 0L) + 1);
+        Database.initializePlayer(playerName);
+        Database.increment(RankStat.DEATH, playerName, 1);
     }
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Location from = event.getFrom();
         Location to = event.getTo();
-        // Only count actual position changes (ignore head rotation)
+        // 視点回転だけの移動は数えない
         if (from.getBlockX() == to.getBlockX() && from.getBlockY() == to.getBlockY() && from.getBlockZ() == to.getBlockZ()) {
             return;
         }
         String playerName = event.getPlayer().getName();
-        initializePlayerData(playerName);
+        Database.initializePlayer(playerName);
         long distance = Math.round(from.distance(to));
         if (distance > 0) {
-            Database.movement_rank.put(playerName, Database.movement_rank.getOrDefault(playerName, 0L) + distance);
+            Database.increment(RankStat.MOVEMENT, playerName, distance);
         }
+    }
+
+    /**
+     * ジャンプ回数。PlayerJumpEvent は Paper 独自イベントで、Bukkit には存在しない。
+     */
+    @EventHandler
+    public void onPlayerJump(PlayerJumpEvent event) {
+        String playerName = event.getPlayer().getName();
+        Database.initializePlayer(playerName);
+        Database.increment(RankStat.JUMP, playerName, 1);
     }
 
     @EventHandler
@@ -77,16 +88,7 @@ public class EventListener implements Listener {
             return;
         }
         String playerName = killer.getName();
-        initializePlayerData(playerName);
-        Database.mob_kill_rank.put(playerName, Database.mob_kill_rank.getOrDefault(playerName, 0L) + 1);
-    }
-
-    private void initializePlayerData(String playerName) {
-        Database.mining_rank.putIfAbsent(playerName, 0L);
-        Database.placing_rank.putIfAbsent(playerName, 0L);
-        Database.online_time_rank.putIfAbsent(playerName, 0L);
-        Database.death_rank.putIfAbsent(playerName, 0L);
-        Database.movement_rank.putIfAbsent(playerName, 0L);
-        Database.mob_kill_rank.putIfAbsent(playerName, 0L);
+        Database.initializePlayer(playerName);
+        Database.increment(RankStat.MOB_KILL, playerName, 1);
     }
 }

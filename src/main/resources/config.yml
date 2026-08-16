@@ -1,46 +1,182 @@
 ranks:
-  # Whether the scoreboard is shown by default for new players
-  # true = scoreboard is shown, false = scoreboard is hidden
+  # 新規プレイヤーにスコアボードを表示するかどうか
+  # true = 表示する / false = 非表示にする
   scoreboard_default: true
-  # Whether to display the mining rank
+  # 採掘ランキングを表示するかどうか
   mining_rank: true
-  # Whether to display the placement rank
+  # 設置ランキングを表示するかどうか
   placing_rank: true
-  # Whether to display the online time rank
+  # プレイ時間ランキングを表示するかどうか
   online_time_rank: true
-  # Whether to display the death rank
+  # 死亡ランキングを表示するかどうか
   death_rank: false
-  # Whether to display the movement distance rank
+  # 移動距離ランキングを表示するかどうか
   movement_rank: true
-  # Whether to display the mob kill rank
+  # モブ討伐ランキングを表示するかどうか
   mob_kill_rank: true
-  # Whether to display the money rank (requires Vault)
+  # ジャンプ回数ランキングを表示するかどうか
+  jump_rank: true
+  # 所持金ランキングを表示するかどうか（Vault が必要）
   money_rank: true
-  # The interval of switching ranks on the scoreboard
+  # --- ここから TrinityForge 連携項目 ---
+  # TrinityForge が入っていない場合、以下の項目は順位表として登録されないため、
+  # true のままでもスコアボードにもコマンドにも一切現れない（何も壊れない）。
+  #
+  # 注意: TrinityForge 側にもモブ討伐の統計があるが、上の mob_kill_rank と
+  #       同じものを二重に表示することになるため、あえて取り込んでいない。
+  #       モブ討伐は 3 サーバー横断で合算される内蔵版（mob_kill_rank）が正。
+  #
+  # スキル別レベル（16 種すべて true にするとスコアボードのスライドが冗長になるので、
+  # 既定では採取・戦闘・魔法の代表 1 つずつだけ有効にしてある）
+  # 採掘レベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_mining_rank: true
+  # 伐採レベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_woodcutting_rank: false
+  # 掘削レベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_digging_rank: false
+  # 農業レベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_farming_rank: false
+  # 釣りレベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_fishing_rank: false
+  # 鍛冶レベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_smithing_rank: false
+  # 錬金レベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_alchemy_rank: false
+  # エンチャントレベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_enchanting_rank: false
+  # 弓術レベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_archery_rank: false
+  # 重武器レベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_heavy_weapons_rank: true
+  # 軽武器レベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_light_weapons_rank: false
+  # 重装レベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_heavy_armor_rank: false
+  # 軽装レベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_light_armor_rank: false
+  # 魔法レベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_ars_magic_rank: true
+  # 魔法鍛冶レベルランキングを表示するかどうか（TrinityForge が必要）
+  tf_skill_ars_smithing_rank: false
+  # 総合レベル(POWER)ランキングを表示するかどうか（TrinityForge が必要）
+  # POWER は他スキルの成長から派生する「総合」レベル。下の合計とは別物。
+  tf_skill_power_rank: true
+  # スキル合計レベルランキングを表示するかどうか（TrinityForge が必要）
+  # こちらは POWER を除いた各スキルレベルの単純「合計」。
+  tf_skill_total_rank: true
+  # 図鑑(アイテム)ランキングを表示するかどうか（TrinityForge が必要）
+  tf_collection_items_rank: true
+  # 図鑑(モブ)ランキングを表示するかどうか（TrinityForge が必要）
+  tf_collection_mobs_rank: true
+  # グリフ解放数ランキングを表示するかどうか（TrinityForge が必要）
+  tf_glyphs_rank: true
+  # --- TrinityForge 連携項目ここまで ---
+
+  # スコアボードの順位表を切り替える間隔（秒）
   switch_interval: 15
-  # The regex to ignore specific usernames
+  # 除外するユーザー名の正規表現
   ignore_username_regex: "Input_a_regex_here_to_ignore_specific_usernames"
 
 storage:
-  # The filename of local SQLite database file
+  # 保存先の種類
+  #   sqlite = このサーバー専用のローカルファイル（従来どおり）
+  #   mysql  = MariaDB / MySQL。複数サーバーでランキングを共通化する場合はこちら
+  type: "sqlite"
+
+  # --- type: sqlite のときの設定 ---
+  # ローカル SQLite ファイルの名前
   database: "database.db"
-  # The interval of saving data to the database
+
+  # --- type: mysql のときの設定 ---
+  # 接続先ホスト
+  host: "127.0.0.1"
+  # 接続先ポート
+  port: 3306
+  # データベース名（事前に CREATE DATABASE しておくこと）
+  database-name: "pixelrank"
+  # ユーザー名
+  username: "root"
+  # パスワード
+  password: ""
+  # 追加の接続パラメータ
+  parameters: "useUnicode=true&characterEncoding=utf8"
+
+  # このサーバーの記録名。rank_stats テーブルの server 列に書き込まれる。
+  # 空にすると起動ディレクトリ名（例: Main_Server）から自動判定する。
+  #
+  # 警告: 同じ名前を 2 台以上のサーバーに付けてはいけない。
+  #       同名にすると互いの行を上書きし合い、片方の記録が消える。
+  #       3 台構成なら必ず別々の名前にすること（例: main / resource / dev）。
+  server-name: ""
+
+  # 起動時に旧 SQLite (database.db) の記録をこのサーバーの記録として取り込むかどうか。
+  # 取り込みが終わると自動的に false へ書き換わるので、二度は実行されない。
+  migrate-from-sqlite: true
+
+  # データベースへ保存する間隔（秒）
+  # 保存は自サーバーの行だけを upsert するので、他サーバーの記録には影響しない。
   save_interval: 60
 
 leaderboards:
-  # The title of the mining rank leaderboard
+  # 採掘ランキングのタイトル
   mining_rank: "Mining"
-  # The title of the placement rank leaderboard
+  # 設置ランキングのタイトル
   placing_rank: "Placement"
-  # The title of the online time rank leaderboard
+  # プレイ時間ランキングのタイトル
   online_time_rank: "Online Time"
-  # The title of the death rank leaderboard
+  # 死亡ランキングのタイトル
   death_rank: "Death"
-  # The title of the movement distance rank leaderboard
+  # 移動距離ランキングのタイトル
   movement_rank: "Movement"
-  # The title of the mob kill rank leaderboard
+  # モブ討伐ランキングのタイトル
   mob_kill_rank: "Mob Kills"
-  # The title of the money rank leaderboard
+  # ジャンプ回数ランキングのタイトル
+  jump_rank: "Jumps"
+  # 所持金ランキングのタイトル
   money_rank: "Money"
-  # The maximum size of the leaderboard
+  # 順位表に表示する最大件数
   max_leaderboard_size: 10
+
+  # --- ここから TrinityForge 連携項目のタイトル ---
+  # TrinityForge が入っていない場合は順位表自体が登録されないので、この設定は使われない。
+  # 採掘レベルランキングのタイトル
+  tf_skill_mining_rank: "Mining Lv"
+  # 伐採レベルランキングのタイトル
+  tf_skill_woodcutting_rank: "Woodcutting Lv"
+  # 掘削レベルランキングのタイトル
+  tf_skill_digging_rank: "Digging Lv"
+  # 農業レベルランキングのタイトル
+  tf_skill_farming_rank: "Farming Lv"
+  # 釣りレベルランキングのタイトル
+  tf_skill_fishing_rank: "Fishing Lv"
+  # 鍛冶レベルランキングのタイトル
+  tf_skill_smithing_rank: "Smithing Lv"
+  # 錬金レベルランキングのタイトル
+  tf_skill_alchemy_rank: "Alchemy Lv"
+  # エンチャントレベルランキングのタイトル
+  tf_skill_enchanting_rank: "Enchanting Lv"
+  # 弓術レベルランキングのタイトル
+  tf_skill_archery_rank: "Archery Lv"
+  # 重武器レベルランキングのタイトル
+  tf_skill_heavy_weapons_rank: "Heavy Weapon Lv"
+  # 軽武器レベルランキングのタイトル
+  tf_skill_light_weapons_rank: "Light Weapon Lv"
+  # 重装レベルランキングのタイトル
+  tf_skill_heavy_armor_rank: "Heavy Armor Lv"
+  # 軽装レベルランキングのタイトル
+  tf_skill_light_armor_rank: "Light Armor Lv"
+  # 魔法レベルランキングのタイトル
+  tf_skill_ars_magic_rank: "Magic Lv"
+  # 魔法鍛冶レベルランキングのタイトル
+  tf_skill_ars_smithing_rank: "Magic Smithing Lv"
+  # 総合レベル(POWER)ランキングのタイトル（他スキルから派生する総合レベル）
+  tf_skill_power_rank: "Overall Lv (Power)"
+  # スキル合計レベルランキングのタイトル（POWER を除いた各スキルレベルの合計）
+  tf_skill_total_rank: "Skill Lv Sum"
+  # 図鑑(アイテム)ランキングのタイトル
+  tf_collection_items_rank: "Item Collection"
+  # 図鑑(モブ)ランキングのタイトル
+  tf_collection_mobs_rank: "Mob Collection"
+  # グリフ解放数ランキングのタイトル
+  tf_glyphs_rank: "Glyphs Unlocked"
+  # --- TrinityForge 連携項目のタイトルここまで ---

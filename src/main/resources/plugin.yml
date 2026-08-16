@@ -1,11 +1,13 @@
 name: PixelRank
-version: '1.2'
+version: '${version}'
 author: CodeZhangBorui
 description: "A plugin that ranks players in multiple values."
 main: com.codezhangborui.pixelRank.PixelRank
 api-version: '1.20'
 softdepend:
   - Vault
+  - TrinityForge
+  - PlaceholderAPI
 commands:
   pixelrank:
     description: "PixelRank commands"
