@@ -14,11 +14,13 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class EventListener implements Listener {
 
     private final JavaPlugin plugin;
+    private final MovementAccumulator movement = new MovementAccumulator();
 
     public EventListener(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -52,20 +54,42 @@ public class EventListener implements Listener {
         Database.increment(RankStat.DEATH, playerName, 1);
     }
 
+    /**
+     * 移動距離。
+     *
+     * <p><b>1 イベントごとに丸めてはいけない</b>: 1 tick あたりの移動量は歩行 0.215 /
+     * スプリント 0.28 ブロックしかなく、旧実装の {@code Math.round} では全部 0 に落ちて
+     * <b>歩行もスプリントも 1 ブロックも計上されていなかった</b>。端数は
+     * {@link MovementAccumulator} で持ち越す。</p>
+     */
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Location from = event.getFrom();
         Location to = event.getTo();
-        // 視点回転だけの移動は数えない
-        if (from.getBlockX() == to.getBlockX() && from.getBlockY() == to.getBlockY() && from.getBlockZ() == to.getBlockZ()) {
+        // 視点回転だけの移動は数えない(座標が完全に同じなら距離0)。
+        // ブロック座標で比べると、ブロックをまたがない移動まで丸ごと捨ててしまう。
+        if (from.getX() == to.getX() && from.getY() == to.getY() && from.getZ() == to.getZ()) {
             return;
         }
-        String playerName = event.getPlayer().getName();
-        Database.initializePlayer(playerName);
-        long distance = Math.round(from.distance(to));
-        if (distance > 0) {
-            Database.increment(RankStat.MOVEMENT, playerName, distance);
+        // PlayerTeleportEvent は PlayerMoveEvent の子なのでここへも飛ぶ。ワールドをまたぐと
+        // Location#distance が IllegalArgumentException を投げるため、先に弾く。
+        if (from.getWorld() == null || !from.getWorld().equals(to.getWorld())) {
+            return;
         }
+        Player player = event.getPlayer();
+        long distance = movement.accumulate(player.getUniqueId(), from.distance(to));
+        if (distance <= 0) {
+            return;
+        }
+        String playerName = player.getName();
+        Database.initializePlayer(playerName);
+        Database.increment(RankStat.MOVEMENT, playerName, distance);
+    }
+
+    /** 退出したプレイヤーの持ち越し端数(1ブロック未満)を捨てる。 */
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        movement.forget(event.getPlayer().getUniqueId());
     }
 
     /**
