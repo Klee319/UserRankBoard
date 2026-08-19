@@ -20,35 +20,41 @@ public enum TrinityForgeStat {
     // 2 つ分けてあるのは、サイドバーの見出しが長いと表全体の横幅が広がって視界を塞ぐため
     // （見出しは短く、一覧は誤解の無いよう長めに、を別々に決められるようにしてある）。
     // どちらも日本語で書く。英語に戻すと config を配り直したサーバだけ英語になり、見た目が割れる。
+    //
+    // 第6引数 defaultEnabled     … 順位表として存在するか（/pixelrank rank で引けるか）。全部 true。
+    // 第7引数 defaultOnScoreboard … サイドバーの巡回に入れるか。代表だけ true。
+    // ★ この 2 つを分けているのが要点。1 つのフラグで兼ねていた頃は「全スキルの順位を引けるように
+    //    する」と「サイドバーが 25 枚を巡回する」が同義で、後者を嫌って 12 スキルを丸ごと
+    //    落としていた（＝一部のスキルしか順位表が無い状態だった）。
 
     // --- スキル別レベル ---
-    SKILL_MINING("skill_MINING_level", "tf_skill_mining_rank", "tfmining", "採掘レベル", "採掘レベル", true),
-    SKILL_WOODCUTTING("skill_WOODCUTTING_level", "tf_skill_woodcutting_rank", "tfwoodcutting", "伐採レベル", "伐採レベル", false),
-    SKILL_DIGGING("skill_DIGGING_level", "tf_skill_digging_rank", "tfdigging", "掘削レベル", "掘削レベル", false),
-    SKILL_FARMING("skill_FARMING_level", "tf_skill_farming_rank", "tffarming", "農業レベル", "農業レベル", false),
-    SKILL_FISHING("skill_FISHING_level", "tf_skill_fishing_rank", "tffishing", "釣りレベル", "釣りレベル", false),
-    SKILL_SMITHING("skill_SMITHING_level", "tf_skill_smithing_rank", "tfsmithing", "鍛冶レベル", "鍛冶レベル", false),
-    SKILL_ALCHEMY("skill_ALCHEMY_level", "tf_skill_alchemy_rank", "tfalchemy", "錬金レベル", "錬金レベル", false),
-    SKILL_ENCHANTING("skill_ENCHANTING_level", "tf_skill_enchanting_rank", "tfenchanting", "付与レベル", "エンチャントレベル", false),
-    SKILL_ARCHERY("skill_ARCHERY_level", "tf_skill_archery_rank", "tfarchery", "弓術レベル", "弓術レベル", false),
-    SKILL_HEAVY_WEAPONS("skill_HEAVY_WEAPONS_level", "tf_skill_heavy_weapons_rank", "tfheavyweapons", "重武器レベル", "重武器レベル", true),
-    SKILL_LIGHT_WEAPONS("skill_LIGHT_WEAPONS_level", "tf_skill_light_weapons_rank", "tflightweapons", "軽武器レベル", "軽武器レベル", false),
-    SKILL_HEAVY_ARMOR("skill_HEAVY_ARMOR_level", "tf_skill_heavy_armor_rank", "tfheavyarmor", "重装レベル", "重装レベル", false),
-    SKILL_LIGHT_ARMOR("skill_LIGHT_ARMOR_level", "tf_skill_light_armor_rank", "tflightarmor", "軽装レベル", "軽装レベル", false),
-    SKILL_ARS_MAGIC("skill_ARS_MAGIC_level", "tf_skill_ars_magic_rank", "tfarsmagic", "魔法レベル", "魔法レベル", true),
-    SKILL_ARS_SMITHING("skill_ARS_SMITHING_level", "tf_skill_ars_smithing_rank", "tfarssmithing", "魔法鍛冶レベル", "魔法鍛冶レベル", false),
+    SKILL_MINING("skill_MINING_level", "tf_skill_mining_rank", "tfmining", "採掘レベル", "採掘レベル", true, true),
+    SKILL_WOODCUTTING("skill_WOODCUTTING_level", "tf_skill_woodcutting_rank", "tfwoodcutting", "伐採レベル", "伐採レベル", true, false),
+    SKILL_DIGGING("skill_DIGGING_level", "tf_skill_digging_rank", "tfdigging", "掘削レベル", "掘削レベル", true, false),
+    SKILL_FARMING("skill_FARMING_level", "tf_skill_farming_rank", "tffarming", "農業レベル", "農業レベル", true, false),
+    SKILL_FISHING("skill_FISHING_level", "tf_skill_fishing_rank", "tffishing", "釣りレベル", "釣りレベル", true, false),
+    SKILL_SMITHING("skill_SMITHING_level", "tf_skill_smithing_rank", "tfsmithing", "鍛冶レベル", "鍛冶レベル", true, false),
+    SKILL_ALCHEMY("skill_ALCHEMY_level", "tf_skill_alchemy_rank", "tfalchemy", "錬金レベル", "錬金レベル", true, false),
+    SKILL_ENCHANTING("skill_ENCHANTING_level", "tf_skill_enchanting_rank", "tfenchanting", "付与レベル", "エンチャントレベル", true, false),
+    SKILL_ARCHERY("skill_ARCHERY_level", "tf_skill_archery_rank", "tfarchery", "弓術レベル", "弓術レベル", true, false),
+    SKILL_HEAVY_WEAPONS("skill_HEAVY_WEAPONS_level", "tf_skill_heavy_weapons_rank", "tfheavyweapons", "重武器レベル", "重武器レベル", true, true),
+    SKILL_LIGHT_WEAPONS("skill_LIGHT_WEAPONS_level", "tf_skill_light_weapons_rank", "tflightweapons", "軽武器レベル", "軽武器レベル", true, false),
+    SKILL_HEAVY_ARMOR("skill_HEAVY_ARMOR_level", "tf_skill_heavy_armor_rank", "tfheavyarmor", "重装レベル", "重装レベル", true, false),
+    SKILL_LIGHT_ARMOR("skill_LIGHT_ARMOR_level", "tf_skill_light_armor_rank", "tflightarmor", "軽装レベル", "軽装レベル", true, false),
+    SKILL_ARS_MAGIC("skill_ARS_MAGIC_level", "tf_skill_ars_magic_rank", "tfarsmagic", "魔法レベル", "魔法レベル", true, true),
+    SKILL_ARS_SMITHING("skill_ARS_SMITHING_level", "tf_skill_ars_smithing_rank", "tfarssmithing", "魔法鍛冶レベル", "魔法鍛冶レベル", true, false),
 
     // --- 総合 / 合計 ---
     // POWER は他スキルの成長から派生する「総合」レベル。
     // 一方 skill_total_level は POWER を除いた各スキルの「合計」。
     // 別物なので、表示名でも取り違えないよう明示的に書き分けている。
-    SKILL_POWER("skill_POWER_level", "tf_skill_power_rank", "tfpower", "総合レベル", "総合レベル", true),
-    SKILL_TOTAL("skill_total_level", "tf_skill_total_rank", "tfskilltotal", "スキル合計", "スキル合計レベル", true),
+    SKILL_POWER("skill_POWER_level", "tf_skill_power_rank", "tfpower", "総合レベル", "総合レベル", true, true),
+    SKILL_TOTAL("skill_total_level", "tf_skill_total_rank", "tfskilltotal", "スキル合計", "スキル合計レベル", true, true),
 
     // --- 図鑑・グリフ ---
-    COLLECTION_ITEMS("collection_items", "tf_collection_items_rank", "tfitems", "図鑑(アイテム)", "図鑑(アイテム)", true),
-    COLLECTION_MOBS("collection_mobs", "tf_collection_mobs_rank", "tfmobs", "図鑑(モブ)", "図鑑(モブ)", true),
-    GLYPHS_UNLOCKED("glyphs_unlocked", "tf_glyphs_rank", "tfglyphs", "グリフ解放数", "グリフ解放数", true);
+    COLLECTION_ITEMS("collection_items", "tf_collection_items_rank", "tfitems", "図鑑(アイテム)", "図鑑(アイテム)", true, true),
+    COLLECTION_MOBS("collection_mobs", "tf_collection_mobs_rank", "tfmobs", "図鑑(モブ)", "図鑑(モブ)", true, true),
+    GLYPHS_UNLOCKED("glyphs_unlocked", "tf_glyphs_rank", "tfglyphs", "グリフ解放数", "グリフ解放数", true, true);
 
     private final String tfStat;
     private final String configKey;
@@ -56,15 +62,18 @@ public enum TrinityForgeStat {
     private final String defaultTitle;
     private final String japaneseLabel;
     private final boolean defaultEnabled;
+    private final boolean defaultOnScoreboard;
 
     TrinityForgeStat(String tfStat, String configKey, String alias,
-                     String defaultTitle, String japaneseLabel, boolean defaultEnabled) {
+                     String defaultTitle, String japaneseLabel,
+                     boolean defaultEnabled, boolean defaultOnScoreboard) {
         this.tfStat = tfStat;
         this.configKey = configKey;
         this.alias = alias;
         this.defaultTitle = defaultTitle;
         this.japaneseLabel = japaneseLabel;
         this.defaultEnabled = defaultEnabled;
+        this.defaultOnScoreboard = defaultOnScoreboard;
     }
 
     /** TF の rankingTop へ渡す stat 文字列。 */
@@ -93,13 +102,24 @@ public enum TrinityForgeStat {
     }
 
     /**
-     * 既定で有効かどうか。
+     * 既定で順位表として存在するかどうか（{@code ranks.*} の既定値）。
      *
-     * <p>16 種のスキルを全部 ON にするとスコアボードのスライドが冗長になるので、
-     * 既定 ON は採取・戦闘・魔法の代表 1 つずつ（採掘 / 重武器 / 魔法）と、
-     * 総合・合計・図鑑・グリフだけにしてある。</p>
+     * <p><b>全項目 true。</b> スキルは 16 種すべてが TF 側の {@code rankingTop} で引けるので、
+     * 「一部のスキルだけ順位表が無い」状態を作らない。</p>
      */
     public boolean defaultEnabled() {
         return defaultEnabled;
+    }
+
+    /**
+     * 既定でサイドバーの巡回対象に入るかどうか（{@code scoreboard.*} の既定値）。
+     *
+     * <p>全部を巡回させるとスライドが 25 枚になって視界を塞ぐので、既定 ON は
+     * 採取・戦闘・魔法の代表 1 つずつ（採掘 / 重武器 / 魔法）と、総合・合計・図鑑・グリフだけ。
+     * <b>ここが false でも {@code /pixelrank rank <alias>} からは普通に引ける</b>のが、
+     * {@link #defaultEnabled()} と分けている理由。</p>
+     */
+    public boolean defaultOnScoreboard() {
+        return defaultOnScoreboard;
     }
 }

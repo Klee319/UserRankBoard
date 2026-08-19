@@ -80,7 +80,9 @@ public class LeaderboardHandler {
 
     /** 現在表示すべき順位表。無効化などで見失ったら先頭へ戻す。 */
     private static RankingSource currentSource() {
-        List<RankingSource> enabled = RankingRegistry.enabled();
+        // enabled() ではなく onScoreboard()。順位表として存在することと、
+        // サイドバーを勝手に流れてくることは別（scoreboard.* が後者を決める）。
+        List<RankingSource> enabled = RankingRegistry.onScoreboard();
         if (enabled.isEmpty()) {
             return null;
         }
@@ -93,9 +95,9 @@ public class LeaderboardHandler {
         return enabled.get(0);
     }
 
-    /** 次の有効な順位表へ切り替える。 */
+    /** 次の順位表へ切り替える（巡回対象のみ）。 */
     public static void switchLeaderboard() {
-        List<RankingSource> enabled = RankingRegistry.enabled();
+        List<RankingSource> enabled = RankingRegistry.onScoreboard();
         if (enabled.isEmpty()) {
             return;
         }

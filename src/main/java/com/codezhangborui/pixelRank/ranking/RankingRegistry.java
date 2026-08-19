@@ -45,11 +45,28 @@ public final class RankingRegistry {
         return Collections.unmodifiableList(SOURCES);
     }
 
-    /** config で有効になっているものだけ。 */
+    /** config で有効になっているものだけ（＝ {@code /pixelrank rank} で引けるもの）。 */
     public static List<RankingSource> enabled() {
         List<RankingSource> result = new ArrayList<>();
         for (RankingSource source : SOURCES) {
             if (source.isEnabled()) {
+                result.add(source);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * サイドバーの巡回対象だけ。
+     *
+     * <p>{@link #enabled()} の部分集合。有効な順位表を全部巡回させると、スキル 16 種を足した
+     * 時点でスライドが 25 枚になり、プレイヤーの視界を塞ぐだけで誰も待てない。
+     * 「引けること」と「勝手に流れてくること」を別の設定にしてある。</p>
+     */
+    public static List<RankingSource> onScoreboard() {
+        List<RankingSource> result = new ArrayList<>();
+        for (RankingSource source : SOURCES) {
+            if (source.isOnScoreboard()) {
                 result.add(source);
             }
         }

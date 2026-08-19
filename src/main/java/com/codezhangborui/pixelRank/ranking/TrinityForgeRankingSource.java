@@ -115,6 +115,14 @@ public final class TrinityForgeRankingSource implements RankingSource {
     }
 
     @Override
+    public boolean isOnScoreboard() {
+        // キーが無いサーバ（この機能より前の config）では enum の既定へ倒す。
+        // ここで素の getBoolean を使うと、未設定 = false でサイドバーが空になる。
+        return isEnabled()
+                && Configuration.getBoolean("scoreboard." + stat.configKey(), stat.defaultOnScoreboard());
+    }
+
+    @Override
     public Map<String, Long> top(int limit, Predicate<String> ignore) {
         // キャッシュを読むだけ。ここから TF を叩かない（メインスレッドで I/O させない）。
         return StatAggregator.top(snapshot, limit, ignore);

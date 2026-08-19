@@ -1,6 +1,7 @@
 package com.codezhangborui.pixelRank;
 
 import com.codezhangborui.pixelRank.database.Database;
+import com.codezhangborui.pixelRank.database.RankStat;
 import com.codezhangborui.pixelRank.handler.EconomyHandler;
 import com.codezhangborui.pixelRank.handler.EventListener;
 import com.codezhangborui.pixelRank.handler.LeaderboardHandler;
@@ -58,6 +59,13 @@ public final class PixelRank extends JavaPlugin {
         Configuration.setDefault("leaderboards.money_rank", "所持金", "所持金ランキングのタイトル");
         Configuration.setDefault("leaderboards.max_leaderboard_size", 10, "順位表に表示する最大件数");
 
+        // scoreboard.* は【サイドバーの巡回対象】だけを決める。ranks.* が false のものは
+        // ここが true でも出ない（順位表として存在しないため）。内蔵項目は従来どおり全部巡回。
+        for (RankStat stat : RankStat.values()) {
+            Configuration.setDefault("scoreboard." + stat.configKey(), true,
+                    "この順位表をサイドバーの巡回に入れるかどうか（ranks." + stat.configKey() + " が前提）");
+        }
+
         loadTrinityForgeConfig();
     }
 
@@ -70,9 +78,48 @@ public final class PixelRank extends JavaPlugin {
     private void loadTrinityForgeConfig() {
         for (TrinityForgeStat stat : TrinityForgeStat.values()) {
             Configuration.setDefault("ranks." + stat.configKey(), stat.defaultEnabled(),
-                    stat.japaneseLabel() + "ランキングを表示するかどうか（TrinityForge が必要）");
+                    stat.japaneseLabel() + "ランキングを引けるようにするかどうか（TrinityForge が必要）");
+            Configuration.setDefault("scoreboard." + stat.configKey(), stat.defaultOnScoreboard(),
+                    stat.japaneseLabel() + "ランキングをサイドバーの巡回に入れるかどうか");
             Configuration.setDefault("leaderboards." + stat.configKey(), stat.defaultTitle(),
                     stat.japaneseLabel() + "ランキングのタイトル");
+        }
+        migrateTrinityForgeRanks();
+    }
+
+    /**
+     * 既に配ってある config の {@code ranks.tf_*: false} を 1 回だけ true へ引き上げる。
+     *
+     * <p><b>{@link Configuration#setDefault} だけでは直らない。</b> setDefault は
+     * 「キーが無いときだけ書く」ので、初期の既定値（スキル 12 種が false）で生成済みの
+     * config には効かない。実際それで「魔法と重武器のレベルしか順位表が無い」状態が続いていた。</p>
+     *
+     * <p>巡回が冗長になる心配は要らない ── サイドバーに出るかどうかは
+     * {@code scoreboard.*} が別に持っているので、この移行で増えるのは
+     * 「{@code /pixelrank rank} から引ける項目」だけ。</p>
+     *
+     * <p>移行後は自分でフラグを false にするので 2 回目は走らない。あとから個別に
+     * 無効化した設定を、次の起動で勝手に戻さないため。</p>
+     */
+    private void migrateTrinityForgeRanks() {
+        Configuration.setDefault("ranks.migrate-tf-ranks", true,
+                "起動時に TF ランキングの無効設定を既定（全て有効）へ戻すかどうか。実行後は自動で false になる。");
+        if (!Configuration.getBoolean("ranks.migrate-tf-ranks")) {
+            return;
+        }
+        int restored = 0;
+        for (TrinityForgeStat stat : TrinityForgeStat.values()) {
+            String path = "ranks." + stat.configKey();
+            if (stat.defaultEnabled() && !Configuration.getBoolean(path)) {
+                Configuration.set(path, true);
+                restored++;
+            }
+        }
+        Configuration.set("ranks.migrate-tf-ranks", false);
+        if (restored > 0) {
+            getLogger().info("\033[32mTF ランキング " + restored
+                    + " 件を有効化しました（/pixelrank rank から引けます）。"
+                    + "サイドバーの巡回対象は scoreboard.* で別に指定します。\033[0m");
         }
     }
 

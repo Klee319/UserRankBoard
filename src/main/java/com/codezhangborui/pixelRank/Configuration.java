@@ -64,6 +64,18 @@ public class Configuration {
         return config.getBoolean(path);
     }
 
+    /**
+     * キーが無いときに false ではなく {@code fallback} を返す版。
+     *
+     * <p>あとから追加したキーに使う。{@link #getBoolean(String)} は未設定を false として返すので、
+     * 既に配ってある config には無いキーで判定すると<b>その機能が黙って全部 OFF になる</b>。
+     * （{@code scoreboard.*} を足したときに実際に踏んだ。{@link #setDefault} が書き込む前に
+     * 読まれる経路が 1 つでもあると再現する。）</p>
+     */
+    public static boolean getBoolean(String path, boolean fallback) {
+        return config.contains(path) ? config.getBoolean(path) : fallback;
+    }
+
     public static double getDouble(String path) {
         return config.getDouble(path);
     }

@@ -26,38 +26,37 @@ ranks:
   #       同じものを二重に表示することになるため、あえて取り込んでいない。
   #       モブ討伐は 3 サーバー横断で合算される内蔵版（mob_kill_rank）が正。
   #
-  # スキル別レベル（16 種すべて true にするとスコアボードのスライドが冗長になるので、
-  # 既定では採取・戦闘・魔法の代表 1 つずつだけ有効にしてある）
+  # スキル別レベル（16 種すべて有効。どれをサイドバーに流すかは下の scoreboard: で決める）
   # 採掘レベルランキングを表示するかどうか（TrinityForge が必要）
   tf_skill_mining_rank: true
   # 伐採レベルランキングを表示するかどうか（TrinityForge が必要）
-  tf_skill_woodcutting_rank: false
+  tf_skill_woodcutting_rank: true
   # 掘削レベルランキングを表示するかどうか（TrinityForge が必要）
-  tf_skill_digging_rank: false
+  tf_skill_digging_rank: true
   # 農業レベルランキングを表示するかどうか（TrinityForge が必要）
-  tf_skill_farming_rank: false
+  tf_skill_farming_rank: true
   # 釣りレベルランキングを表示するかどうか（TrinityForge が必要）
-  tf_skill_fishing_rank: false
+  tf_skill_fishing_rank: true
   # 鍛冶レベルランキングを表示するかどうか（TrinityForge が必要）
-  tf_skill_smithing_rank: false
+  tf_skill_smithing_rank: true
   # 錬金レベルランキングを表示するかどうか（TrinityForge が必要）
-  tf_skill_alchemy_rank: false
+  tf_skill_alchemy_rank: true
   # エンチャントレベルランキングを表示するかどうか（TrinityForge が必要）
-  tf_skill_enchanting_rank: false
+  tf_skill_enchanting_rank: true
   # 弓術レベルランキングを表示するかどうか（TrinityForge が必要）
-  tf_skill_archery_rank: false
+  tf_skill_archery_rank: true
   # 重武器レベルランキングを表示するかどうか（TrinityForge が必要）
   tf_skill_heavy_weapons_rank: true
   # 軽武器レベルランキングを表示するかどうか（TrinityForge が必要）
-  tf_skill_light_weapons_rank: false
+  tf_skill_light_weapons_rank: true
   # 重装レベルランキングを表示するかどうか（TrinityForge が必要）
-  tf_skill_heavy_armor_rank: false
+  tf_skill_heavy_armor_rank: true
   # 軽装レベルランキングを表示するかどうか（TrinityForge が必要）
-  tf_skill_light_armor_rank: false
+  tf_skill_light_armor_rank: true
   # 魔法レベルランキングを表示するかどうか（TrinityForge が必要）
   tf_skill_ars_magic_rank: true
   # 魔法鍛冶レベルランキングを表示するかどうか（TrinityForge が必要）
-  tf_skill_ars_smithing_rank: false
+  tf_skill_ars_smithing_rank: true
   # 総合レベル(POWER)ランキングを表示するかどうか（TrinityForge が必要）
   # POWER は他スキルの成長から派生する「総合」レベル。下の合計とは別物。
   tf_skill_power_rank: true
@@ -76,6 +75,48 @@ ranks:
   switch_interval: 15
   # 除外するユーザー名の正規表現
   ignore_username_regex: "Input_a_regex_here_to_ignore_specific_usernames"
+  # 起動時に TF ランキングの無効設定を既定（全て有効）へ戻すかどうか。実行後は自動で false になる。
+  # 旧版の既定値でスキル 12 種が false のまま生成された config を 1 回だけ直すためのもの。
+  migrate-tf-ranks: true
+
+# サイドバー（スコアボード）の巡回対象。
+#
+# ranks: が「その順位表を引けるか」、ここが「サイドバーに勝手に流れてくるか」。
+# 2 つに分けてあるのは、有効な順位表を全部巡回させるとスキル 16 種を足した時点で
+# スライドが 25 枚になり、誰も最後まで待てないため。
+# ここが false でも /pixelrank rank <短縮名> からは普通に引ける。
+# ranks: が false のものは、ここが true でも出ない（順位表として存在しないため）。
+scoreboard:
+  mining_rank: true
+  placing_rank: true
+  online_time_rank: true
+  death_rank: true
+  movement_rank: true
+  mob_kill_rank: true
+  jump_rank: true
+  money_rank: true
+  # --- TrinityForge 連携項目 ---
+  # 既定は採取・戦闘・魔法の代表 1 つずつ（採掘 / 重武器 / 魔法）＋ 総合・合計・図鑑・グリフ。
+  tf_skill_mining_rank: true
+  tf_skill_woodcutting_rank: false
+  tf_skill_digging_rank: false
+  tf_skill_farming_rank: false
+  tf_skill_fishing_rank: false
+  tf_skill_smithing_rank: false
+  tf_skill_alchemy_rank: false
+  tf_skill_enchanting_rank: false
+  tf_skill_archery_rank: false
+  tf_skill_heavy_weapons_rank: true
+  tf_skill_light_weapons_rank: false
+  tf_skill_heavy_armor_rank: false
+  tf_skill_light_armor_rank: false
+  tf_skill_ars_magic_rank: true
+  tf_skill_ars_smithing_rank: false
+  tf_skill_power_rank: true
+  tf_skill_total_rank: true
+  tf_collection_items_rank: true
+  tf_collection_mobs_rank: true
+  tf_glyphs_rank: true
 
 storage:
   # 保存先の種類

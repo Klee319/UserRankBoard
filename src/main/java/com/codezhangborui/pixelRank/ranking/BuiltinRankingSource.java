@@ -56,6 +56,13 @@ public class BuiltinRankingSource implements RankingSource {
     }
 
     @Override
+    public boolean isOnScoreboard() {
+        // 内蔵項目はもともと全部サイドバーに出ていたので、キーが無いときの既定は true。
+        // （素の getBoolean だと未設定 = false になり、更新した瞬間サイドバーが空になる）
+        return isEnabled() && Configuration.getBoolean("scoreboard." + stat.configKey(), true);
+    }
+
+    @Override
     public Map<String, Long> top(int limit, Predicate<String> ignore) {
         return StatAggregator.top(Database.aggregated(stat), limit, ignore);
     }

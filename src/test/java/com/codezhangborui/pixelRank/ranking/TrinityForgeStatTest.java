@@ -69,17 +69,55 @@ class TrinityForgeStatTest {
                 .equals(TrinityForgeStat.SKILL_TOTAL.japaneseLabel()));
     }
 
+    /** 個別スキル（POWER と合計を除く）だけを数える。 */
+    private static boolean isPerSkill(TrinityForgeStat stat) {
+        return stat.tfStat().startsWith("skill_")
+                && !stat.tfStat().equals("skill_total_level")
+                && stat != TrinityForgeStat.SKILL_POWER;
+    }
+
     @Test
-    void 既定で有効なスキル別レベルは代表3つだけ() {
-        int enabledSkills = 0;
+    void スキル別レベルはTFの16種ぶん全部そろっている() {
+        // TF の SkillId.ALL は POWER を含めて 16 種。ここでは POWER を別枠で持っているので
+        // 個別スキルは 15 種になる。数が減ったら「一部のスキルだけ順位表が無い」状態の再来。
+        int perSkill = 0;
         for (TrinityForgeStat stat : TrinityForgeStat.values()) {
-            boolean perSkill = stat.tfStat().startsWith("skill_")
-                    && !stat.tfStat().equals("skill_total_level")
-                    && stat != TrinityForgeStat.SKILL_POWER;
-            if (perSkill && stat.defaultEnabled()) {
-                enabledSkills++;
+            if (isPerSkill(stat)) {
+                perSkill++;
             }
         }
-        assertEquals(3, enabledSkills, "既定 ON のスキルを増やすとスコアボードのスライドが冗長になる");
+        assertEquals(15, perSkill, "TF のスキル(POWER 除く 15 種)に対して順位表が足りていない");
+        assertTrue(TrinityForgeStat.SKILL_POWER.defaultEnabled(), "総合(POWER)が既定で無効になっている");
+    }
+
+    @Test
+    void 順位表は全項目が既定で有効() {
+        for (TrinityForgeStat stat : TrinityForgeStat.values()) {
+            assertTrue(stat.defaultEnabled(),
+                    stat + " が既定 OFF。/pixelrank rank から引けないスキルを作らない");
+        }
+    }
+
+    @Test
+    void サイドバーの巡回は代表スキル3つに絞ってある() {
+        // 「引けること」と「勝手に流れてくること」を分けたので、ここだけは絞ったまま。
+        // 全部 ON にするとスライドが 25 枚になり、視界を塞ぐだけで誰も最後まで待てない。
+        int onScoreboard = 0;
+        for (TrinityForgeStat stat : TrinityForgeStat.values()) {
+            if (isPerSkill(stat) && stat.defaultOnScoreboard()) {
+                onScoreboard++;
+            }
+        }
+        assertEquals(3, onScoreboard, "既定で巡回するスキルを増やすとスコアボードのスライドが冗長になる");
+    }
+
+    @Test
+    void 巡回対象は必ず有効な項目の部分集合() {
+        for (TrinityForgeStat stat : TrinityForgeStat.values()) {
+            if (stat.defaultOnScoreboard()) {
+                assertTrue(stat.defaultEnabled(),
+                        stat + " は巡回対象なのに順位表として無効。存在しない板を流そうとしている");
+            }
+        }
     }
 }
